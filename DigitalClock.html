@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Digital Circular Clock</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+  body {
+    margin: 0;
+    height: 100vh;
+    background-color: #1e1e28;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-family: 'Orbitron', monospace;
+  }
+
+  .clock {
+    position: relative;
+    width: 480px;
+    height: 480px;
+  }
+
+  .time {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.6rem;
+    letter-spacing: 0.12em;
+    color: #eee;
+    user-select: none;
+  }
+
+  .ampm {
+    position: absolute;
+    top: 58%;
+    left: 60%;
+    font-size: 1.1rem;
+    color: #d3d3d3;
+    user-select: none;
+  }
+
+  svg {
+    width: 480px;
+    height: 480px;
+    transform: rotate(-90deg);
+  }
+
+  /* Background circles */
+  .circle-bg {
+    fill: none;
+  }
+
+  /* Outer circle - Seconds */
+  .circle-seconds {
+    fill: none;
+    stroke: #e0a15a;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease;
+  }
+
+  /* Middle circle - Minutes */
+  .circle-minutes {
+    fill: none;
+    stroke: #7cb8bc;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease;
+  }
+
+  /* Inner circle - Hours */
+  .circle-hours {
+    fill: none;
+    stroke: #e96e6e;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease;
+  }
+</style>
+</head>
+<body>
+  <div class="clock">
+    <svg viewBox="0 0 100 100">
+      <!-- Background circles -->
+      <circle class="circle-bg" cx="50" cy="50" r="44"></circle> <!-- seconds bg -->
+      <circle class="circle-bg" cx="50" cy="50" r="36"></circle> <!-- minutes bg -->
+      <circle class="circle-bg" cx="50" cy="50" r="28"></circle> <!-- hours bg -->
+
+      <!-- Progress circles -->
+      <circle class="circle-seconds" cx="50" cy="50" r="44" stroke-dasharray="276.46" stroke-dashoffset="276.46"></circle>
+      <circle class="circle-minutes" cx="50" cy="50" r="36" stroke-dasharray="226.19" stroke-dashoffset="226.19"></circle>
+      <circle class="circle-hours" cx="50" cy="50" r="28" stroke-dasharray="175.93" stroke-dashoffset="175.93"></circle>
+    </svg>
+    <div class="time" id="time">00 : 00 : 00</div>
+    <div class="ampm" id="ampm">AM</div>
+  </div>
+
+  <script>
+    const hoursCircle = document.querySelector('.circle-hours');
+    const minutesCircle = document.querySelector('.circle-minutes');
+    const secondsCircle = document.querySelector('.circle-seconds');
+
+    const timeElement = document.getElementById('time');
+    const ampmElement = document.getElementById('ampm');
+
+    // Circumferences:
+    const secondsCircumference = 2 * Math.PI * 44; // ~276.46
+    const minutesCircumference = 2 * Math.PI * 36; // ~226.19
+    const hoursCircumference = 2 * Math.PI * 28;   // ~175.93
+
+    function updateClock() {
+      const now = new Date();
+      let h = now.getHours();
+      const m = now.getMinutes();
+      const s = now.getSeconds();
+
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      ampmElement.textContent = ampm;
+
+      // 12-hour format
+      h = h % 12;
+      h = h ? h : 12;
+
+      // Format time string
+      const hStr = h < 10 ? '0' + h : h;
+      const mStr = m < 10 ? '0' + m : m;
+      const sStr = s < 10 ? '0' + s : s;
+
+      timeElement.textContent = `${hStr} : ${mStr} : ${sStr}`;
+
+      // Calculate stroke dash offset for seconds, minutes, and hours
+      const secondsOffset = secondsCircumference - (s / 60) * secondsCircumference;
+      const minutesOffset = minutesCircumference - (m / 60) * minutesCircumference;
+      const hoursOffset = hoursCircumference - (h / 12) * hoursCircumference;
+
+      secondsCircle.style.strokeDashoffset = secondsOffset;
+      minutesCircle.style.strokeDashoffset = minutesOffset;
+      hoursCircle.style.strokeDashoffset = hoursOffset;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
